@@ -89,35 +89,80 @@ Os requisitos funcionais descrevem as operações que o sistema deverá permitir
 
 ## 5. MVP — Produto Mínimo Viável
 
-O MVP corresponde à primeira versão funcional do FinTrack. Deve incluir apenas as funcionalidades essenciais para demonstrar que a aplicação resolve o problema identificado.
+O MVP do FinTrack corresponde à primeira versão funcional da aplicação
+que permite ao utilizador registar e acompanhar as suas despesas pessoais.
 
-### 5.1. Funcionalidades incluídas
+O objetivo é disponibilizar as funcionalidades essenciais para consultar
+os gastos mensais, identificar as categorias com maiores despesas e manter
+um histórico organizado dos movimentos financeiros.
 
-- [ ] Registar receitas.
-- [ ] Registar despesas.
-- [ ] Consultar o histórico de movimentos financeiros.
-- [ ] Categorizar receitas e despesas.
-- [ ] Visualizar o saldo total.
-- [ ] Visualizar os totais de receitas e despesas.
-- [ ] Guardar os movimentos numa base de dados PostgreSQL.
-- [ ] Disponibilizar uma interface web simples e responsiva.
-- [ ] Validar os dados introduzidos pelo utilizador.
-- [ ] Executar testes automatizados das funcionalidades principais.
+### 5.1. Funcionalidades essenciais
 
-### 5.2. Critérios de aceitação do MVP
+O MVP deverá incluir as seguintes funcionalidades:
 
-O MVP será considerado funcional quando:
+#### RF01 — Criar despesas
 
-1. For possível registar uma receita com os dados obrigatórios.
-2. For possível registar uma despesa com os dados obrigatórios.
-3. Os movimentos registados forem apresentados no histórico.
-4. Os movimentos puderem ser associados a categorias.
-5. O saldo apresentado corresponder à diferença entre receitas e despesas.
-6. Os totais de receitas e despesas forem calculados corretamente.
-7. Os dados permanecerem disponíveis depois de reiniciar o servidor.
-8. A API validar os dados recebidos e devolver respostas HTTP adequadas.
-9. Os testes automatizados das funcionalidades principais forem aprovados.
-10. A interface permitir utilizar as funcionalidades essenciais sem erros impeditivos.
+O sistema deverá permitir registar uma nova despesa com os seguintes dados:
+
+- Montante em euros (EUR).
+- Data da despesa.
+- Categoria.
+- Descrição opcional.
+
+#### RF02 — Listar despesas
+
+O sistema deverá apresentar uma lista das despesas registadas,
+incluindo o montante, a data, a categoria e a descrição, quando exista.
+
+#### RF03 — Editar despesas
+
+O sistema deverá permitir alterar os dados de uma despesa existente.
+
+Após a edição, os dados atualizados deverão ser apresentados na lista
+e considerados nos cálculos dos resumos financeiros.
+
+#### RF04 — Eliminar despesas
+
+O sistema deverá permitir eliminar uma despesa existente.
+
+Após a eliminação, a despesa não deverá ser incluída nos totais
+ou nos resumos mensais.
+
+#### RF05 — Filtrar despesas
+
+O sistema deverá permitir filtrar as despesas por:
+
+- Mês.
+- Categoria.
+
+Os filtros deverão poder ser utilizados para consultar apenas
+as despesas correspondentes aos critérios selecionados.
+
+#### RF06 — Consultar resumo mensal
+
+O sistema deverá apresentar um resumo das despesas de um mês,
+incluindo:
+
+- Total gasto no mês.
+- Total gasto por categoria.
+
+Os valores apresentados deverão corresponder às despesas registadas
+que correspondam ao período selecionado.
+
+### 5.2. Melhorias futuras
+
+As seguintes funcionalidades não fazem parte do MVP inicial:
+
+- Gráficos financeiros avançados.
+- Definição de limites de despesas por categoria.
+- Notificações quando um limite é ultrapassado.
+- Exportação de relatórios para PDF ou Excel.
+- Importação automática de movimentos bancários.
+- Recomendações financeiras com Inteligência Artificial.
+- Comparação avançada de despesas entre vários meses.
+
+Estas funcionalidades poderão ser consideradas em versões futuras,
+depois de as funcionalidades essenciais estarem implementadas e testadas.
 
 ### 5.3. Funcionalidades fora do MVP
 
