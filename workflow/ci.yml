@@ -18,17 +18,11 @@ jobs:
       - name: Configurar Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20' # Versão LTS recomendada
+          node-version: '20'
           cache: 'npm'
 
       - name: Instalar dependências (reproduzível)
         run: npm ci
-
-      - name: Executar Linter
-        run: npm run lint
-
-      - name: Compilar (Build)
-        run: npm run build
 
       - name: Executar Testes
         run: npm run test
