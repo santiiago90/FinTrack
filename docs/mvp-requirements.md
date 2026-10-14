@@ -87,6 +87,11 @@ Os requisitos funcionais descrevem as operações que o sistema deverá permitir
 - Os valores monetários devem ser armazenados com precisão adequada para operações financeiras.
 - Os dados financeiros devem ser persistidos e disponibilizados após reiniciar a aplicação.
 
+- **Validação de campos:** O sistema deve impedir o registo de movimentos com dados inválidos (ex: montante negativo, campos obrigatórios em falta ou formato de data incorreto).
+- **Tratamento de erros do utilizador:** Em caso de dados inválidos, a interface deve apresentar mensagens de erro claras e amigáveis junto ao campo respetivo (ex: "O montante tem de ser maior que zero").
+- **Tratamento de erros de sistema:** Em caso de falha de comunicação com o servidor ou base de dados, a interface deve apresentar uma mensagem genérica de falha (ex: "Não foi possível guardar a operação. Tente novamente mais tarde.") e o backend deve registar os detalhes técnicos do erro nos logs para observabilidade.
+
+
 ## 5. MVP — Produto Mínimo Viável
 
 O MVP do FinTrack corresponde à primeira versão funcional da aplicação
@@ -149,6 +154,12 @@ incluindo:
 Os valores apresentados deverão corresponder às despesas registadas
 que correspondam ao período selecionado.
 
+### 5.1.1. Decisão sobre Autenticação no MVP
+
+Para garantir a entrega rápida das funcionalidades principais e focar o esforço na lógica financeira essencial, **o MVP não incluirá um sistema de autenticação (login/registo)**. 
+
+A aplicação funcionará inicialmente num modo de utilizador único (*single-user*), assumindo que apenas uma pessoa está a aceder e a utilizar o sistema localmente. O requisito de Autenticação (RF12) e o suporte a múltiplos utilizadores ficam formalmente adiados para as "Melhorias futuras", altura em que a base da aplicação já estará estabilizada.
+
 ### 5.2. Melhorias futuras
 
 As seguintes funcionalidades não fazem parte do MVP inicial:
@@ -160,6 +171,7 @@ As seguintes funcionalidades não fazem parte do MVP inicial:
 - Importação automática de movimentos bancários.
 - Recomendações financeiras com Inteligência Artificial.
 - Comparação avançada de despesas entre vários meses.
+- Autenticação e gestão de múltiplos utilizadores (Login/Registo).
 
 Estas funcionalidades poderão ser consideradas em versões futuras,
 depois de as funcionalidades essenciais estarem implementadas e testadas.
