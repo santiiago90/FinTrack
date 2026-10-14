@@ -38,8 +38,8 @@ Este quadro serve como o ponto central para aceder a todos os recursos important
 | Recurso | Descrição | Link |
 |---------|-----------|------|
 | **Repositório** | Código-fonte no GitHub | [Link para o Repositório](https://github.com/teu-user/FinTrack) |
-| **Execuções CI (Runs)** | Histórico do GitHub Actions | [Link para Actions](https://github.com/teu-user/FinTrack/actions) |
-| **Board do Jira** | Gestão de tarefas, Sprints e acompanhamento | [Link para o Jira](https://o-teu-jira.atlassian.net) |
+| **Execuções CI (Runs)** | Histórico do GitHub Actions | [Link para Actions](https://github.com/santiiago90/FinTrack/actions) |
+| **Board do Jira** | Gestão de tarefas, Sprints e acompanhamento | [Link para o Jira]([https://o-teu-jira.atlassian.net](https://santiagoadaofernandes.atlassian.net/jira/software/projects/XOPS/boards/34?filter=&groupBy=none)) |
 | **Requisitos MVP** | Documento de requisitos funcionais | [mvp-requirements.md](./mvp-requirements.md) |
 | **Arquitetura (Diagrama)**| Desenho da arquitetura base | [architecture.md](./architecture.md) |
 | **ADR-001** | Decisão sobre a Arquitetura | [ADR-001-arquitetura-monolitica-modular.md](./ADR-001-arquitetura-monolitica-modular.md) |
