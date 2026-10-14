@@ -7,13 +7,16 @@
     "test": "tests"
   },
 
-  "scripts": {
+    "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
+    "build": "echo 'Build não é necessário para Node.js puro'",
+    "lint": "eslint .",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage"
   },
+
 
   "keywords": [],
   "author": "",
