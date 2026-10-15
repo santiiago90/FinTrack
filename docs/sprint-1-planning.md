@@ -19,8 +19,8 @@ Estabelecer a infraestrutura base do projeto FinTrack, definir a arquitetura fun
 5. Registo do planeamento do Sprint 1.
 
 ## 4. Divisão de Responsabilidades e Rotação do PO
-- **Santiago Fernandes (PO Sprint 1):** Responsável por guiar os requisitos, validar critérios de aceitação, aprovar documentação arquitetural e organizar o backlog.
-- **João (Developer Sprint 1):** Focado na implementação técnica da infraestrutura, configuração do ESLint e criação do workflow no GitHub Actions.
+- **João (PO Sprint 1):** Responsável por guiar os requisitos, validar critérios de aceitação, aprovar documentação arquitetural e organizar o backlog.
+- **Santiago (Developer Sprint 1):** Focado na implementação técnica da infraestrutura, configuração do ESLint e criação do workflow no GitHub Actions.
 - **Plano de Rotação de PO:** Foi acordado que **o João assumirá o papel de Product Owner no Sprint 2**. A partir daí, o papel de PO alternará entre os dois membros nos sprints seguintes.
 
 ## 5. Dependências e Riscos
