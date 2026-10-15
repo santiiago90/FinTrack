@@ -1,39 +1,48 @@
+
+# Pipeline de Integração Contínua do FinTrack
 name: FinTrack CI
 
+# Executar em pushes e Pull Requests para a branch main
 on:
   push:
-    branches: [ "main" ]
+    branches: [main]
   pull_request:
-    branches: [ "main" ]
+    branches: [main]
 
 jobs:
-  build-and-test:
-    name: Build & Test
+  backend-ci:
+    name: Backend - Lint, Build e Testes
     runs-on: ubuntu-latest
 
+    defaults:
+      run:
+        working-directory: backend
+
     steps:
-      - name: Checkout do código
+      # Obter o código do repositório
+      - name: Checkout
         uses: actions/checkout@v4
 
+      # Preparar o ambiente Node.js
       - name: Configurar Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: 'backend/package-lock.json'
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
 
-      - name: Instalar dependências (reproduzível)
+      # Instalar as dependências
+      - name: Instalar dependências
         run: npm ci
-        working-directory: ./backend
 
-      - name: Executar Linter
+      # Verificar a qualidade do código
+      - name: Executar ESLint
         run: npm run lint
-        working-directory: ./backend
 
-      - name: Compilar (Build)
+      # Verificar a sintaxe do backend
+      - name: Verificar build
         run: npm run build
-        working-directory: ./backend
 
-      - name: Executar Testes
-        run: npm run test
-        working-directory: ./backend
+      # Executar testes automatizados
+      - name: Executar testes
+        run: npm test
