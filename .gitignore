@@ -4,3 +4,9 @@ node_modules/
 dist/ 
 coverage/ 
 *.log
+
+!.env.example
+!**/.env.example
+security/*-results.json
+
+.venv-sast/

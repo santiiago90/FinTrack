@@ -1,0 +1,19 @@
+# Apoio à execução local. A aplicação corre com npm no host.
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: fintrack
+      POSTGRES_USER: fintrack
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Defina DB_PASSWORD no ambiente ou no ficheiro .env da raiz}
+    ports:
+      - '127.0.0.1:5432:5432'
+    volumes:
+      - fintrack-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U fintrack -d fintrack']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+volumes:
+  fintrack-data:

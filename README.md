@@ -1,418 +1,103 @@
-# 💰 FinTrack — Personal Expense Management System
+# FinTrack — Gestor de despesas pessoais
 
-![Project Status](https://img.shields.io/badge/Status-In%20Development-yellow)
-![Node.js](https://img.shields.io/badge/Node.js-Backend-339933?logo=nodedotjs&logoColor=white)
-![React](https://img.shields.io/badge/React-Frontend-61DAFB?logo=react&logoColor=black)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Database-4169E1?logo=postgresql&logoColor=white)
-![Docker](https://img.shields.io/badge/Docker-Containerization-2496ED?logo=docker&logoColor=white)
-![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-CI%2FCD-2088FF?logo=githubactions&logoColor=white)
+O **FinTrack** é uma aplicação web que ajuda estudantes e jovens adultos a registar despesas, organizar gastos por categoria e perceber quanto gastam em cada mês.
 
-## 📖 About the Project
+O projeto é desenvolvido na unidade curricular **Plataformas e Serviços X-Ops**, na Universidade da Beira Interior, no ano letivo **2026/2027**, por **Santiago Fernandes e João**.
 
-**FinTrack** is a web-based personal finance management application designed to help users organize, monitor, and analyze their financial activities.
+Além da aplicação, o projeto explora a construção de uma pipeline de qualidade e entrega de software: testes automatizados, análise de segurança, validações assistidas por IA e observabilidade, introduzidos progressivamente ao longo dos sprints.
 
-The platform aims to provide an intuitive and responsive interface for tracking income, expenses, budgets, and financial trends.
+## Ideia e objetivo
 
-Beyond its financial management capabilities, FinTrack serves as a practical implementation of modern **DevOps, DevSecOps, AIOps, and AI for Software Engineering (AI4SE)** principles.
+O FinTrack pretende centralizar o registo de despesas que, de outra forma, ficariam dispersas por apontamentos ou aplicações diferentes. O utilizador consegue manter um histórico e consultar o total mensal e a distribuição por categoria.
 
-The project focuses on developing an intelligent **Continuous Integration and Continuous Deployment (CI/CD) pipeline**, integrating automated testing, security analysis, AI-assisted quality gates, and application monitoring.
+O MVP concentra-se no acompanhamento de despesas. Autenticação, receitas, orçamentos e funcionalidades financeiras avançadas não fazem parte da implementação atual.
 
-### 🎯 Main Objectives
+## Documentação por sprint
 
-- Develop a functional and responsive personal finance application.
-- Implement secure user authentication and financial data management.
-- Automate software building, testing, and deployment.
-- Integrate static and dynamic application security testing.
-- Incorporate AI-assisted code analysis and quality validation.
-- Monitor application performance and reliability.
-- Apply Agile development practices using Scrum.
-- Evaluate the effectiveness and reproducibility of AI-based quality gates.
+Cada sprint tem um README próprio, com o respetivo objetivo, trabalho realizado, instruções e evidências disponíveis.
 
----
+| Sprint | Foco | Documento |
+|---|---|---|
+| Sprint 1 | Fundação do projeto, requisitos, arquitetura e CI inicial | [README do Sprint 1](docs/sprints/sprint-1/README.md) |
+| Sprint 2 | MVP de despesas, persistência PostgreSQL, interface e SAST | [README do Sprint 2](docs/sprints/sprint-2/README.md) |
 
-## ✨ Planned Features
+Os documentos dos restantes sprints serão criados quando esses sprints começarem. O planeamento detalhado e o estado das tarefas são acompanhados no Jira.
 
-### 🔐 User Authentication
-- User registration and login.
-- JWT-based authentication.
-- Secure password hashing.
-- Protected API endpoints.
-- User-specific financial information.
+**Para instalar e executar a versão atual, segue o [guia de arranque do Sprint 2](docs/sprints/sprint-2/README.md#primeira-instalação).**
 
-### 💳 Income and Expense Management
-- Add income and expense transactions.
-- Edit and delete existing transactions.
-- Categorize financial movements.
-- Filter transactions by date, type, and category.
-- View transaction history.
+## Funcionalidades implementadas
 
-### 📊 Financial Dashboard
-- Overview of total income and expenses.
-- Current financial balance.
-- Monthly financial summaries.
-- Interactive charts and statistics.
-- Expense distribution by category.
+- Criar, consultar, editar e eliminar despesas.
+- Guardar montante em EUR, data, categoria e descrição opcional.
+- Validar dados e apresentar mensagens de erro por campo.
+- Filtrar o histórico por mês e categoria.
+- Consultar o total mensal e o total por categoria.
+- Persistir os dados em PostgreSQL, com volume Docker.
+- Executar testes automatizados e análise estática de segurança.
 
-### 🎯 Budget Management
-- Define monthly spending limits.
-- Create category-based budgets.
-- Track budget consumption.
-- Receive notifications when spending limits are exceeded.
+O MVP funciona localmente, para um único utilizador, sem autenticação. As configurações de arranque limitam os serviços ao computador local por defeito.
 
-### 🤖 Intelligent Features (Optional)
-- Detection of unusual spending patterns.
-- AI-assisted financial insights.
-- Personalized spending analysis.
+## Arquitetura
 
-**Note:** AI-powered financial features are optional extensions. The primary AI requirement of this project is the integration of AI-enhanced quality gates into the CI/CD pipeline.
-
----
-
-## 🏗️ System Architecture
-
-FinTrack follows a planned **modular monolithic architecture**, separating the frontend, backend, and database into clearly defined components.
-
-The architecture prioritizes maintainability, testability, security, and ease of deployment.
-
-### Architecture Overview
-
-```mermaid
-flowchart TD
-    A[User] --> B[React Frontend]
-    B --> C[Node.js / Express REST API]
-    C --> D[(PostgreSQL Database)]
-
-    E[GitHub Repository] --> F[GitHub Actions CI/CD]
-    F --> G[Automated Tests]
-    F --> H[SAST and DAST]
-    F --> I[AI Quality Gate]
-
-    G --> J{Quality Gates Passed?}
-    H --> J
-    I --> J
-
-    J -->|Yes| K[Docker Deployment]
-    J -->|No| L[Pipeline Failure Report]
-
-    K --> M[Prometheus and Grafana]
-```
-
-### Architectural Principles
-
-- **Modularity:** separation of application responsibilities.
-- **Security:** authentication, authorization, and automated vulnerability analysis.
-- **Maintainability:** organized codebase and automated testing.
-- **Reproducibility:** version-controlled configurations and containerized environments.
-- **Observability:** application metrics, dashboards, and alerts.
-
----
-
-## 🛠️ Technology Stack
-
-The following technologies are planned for development.
-
-| Component | Technology |
-|---|---|
-| Frontend | React, Vite, JavaScript, CSS |
-| Backend | Node.js, Express.js |
-| Database | PostgreSQL |
-| Authentication | JWT, bcrypt |
-| API Architecture | REST |
-| Testing | Vitest, Supertest |
-| CI/CD | GitHub Actions |
-| Containerization | Docker, Docker Compose |
-| Static Security Testing | Semgrep |
-| Dynamic Security Testing | OWASP ZAP |
-| AI Quality Gates | LLM API Integration |
-| Monitoring | Prometheus, Grafana |
-| Version Control | Git, GitHub |
-| Project Management | Jira |
-
----
-
-## 📁 Project Structure
-
-The repository is organized into the following directories:
+O projeto segue a decisão de **monólito modular**, com separação entre apresentação, API e persistência.
 
 ```text
-gestor-despesas-pessoais/
-│
-├── frontend/
-│   └── React application
-│
-├── backend/
-│   └── Node.js and Express REST API
-│
-├── database/
-│   └── PostgreSQL scripts and migrations
-│
-├── tests/
-│   └── Integration and end-to-end tests
-│
-├── docker/
-│   └── Docker configurations
-│
-├── docs/
-│   └── Architecture and project documentation
-│
-├── scripts/
-│   └── Development and automation scripts
-│
-├── .github/
-│   └── workflows/
-│       └── CI/CD pipeline configurations
-│
-├── README.md
-├── .gitignore
-├── .env.example
-└── docker-compose.yml
+Navegador
+   |
+   v
+React + Vite  -- HTTP/JSON -->  API Express  -- SQL parametrizado -->  PostgreSQL
+Frontend                       Backend                             Docker + volume
 ```
 
-**Note:** This structure represents the intended organization and will be populated progressively during development.
+Na execução de desenvolvimento, o Vite encaminha os pedidos `/api` para o backend. O backend valida os pedidos e acede à base de dados através de um repositório SQL.
 
----
-
-## 🔄 Intelligent CI/CD Pipeline
-
-A central objective of FinTrack is to implement an automated software delivery pipeline.
-
-The pipeline will be triggered by relevant GitHub events, including pushes and pull requests.
-
-### Planned Pipeline Stages
-
-**1. Source Code Checkout**
-
-Retrieve the latest version of the application from the GitHub repository.
-
-**2. Build and Dependency Installation**
-
-Install dependencies and verify that the application can be successfully built.
-
-**3. Automated Testing**
-
-Execute unit and integration tests to validate application functionality.
-
-**4. Static Application Security Testing (SAST)**
-
-Analyze source code to identify potential security vulnerabilities and insecure coding patterns.
-
-**5. AI-Enhanced Quality Gate**
-
-Use an AI-based tool to review code changes, analyze test results, and identify potential quality issues.
-
-**6. Dynamic Application Security Testing (DAST)**
-
-Execute security scans against a running instance of the application.
-
-**7. Deployment**
-
-Deploy approved application versions using containerized environments.
-
-**8. Monitoring and Observability**
-
-Collect operational metrics and provide dashboards and alerts.
-
-Failed mandatory quality gates will prevent the deployment process from proceeding.
-
----
-
-## 🧠 AI-Augmented Software Quality
-
-The project aims to investigate the role of Artificial Intelligence in modern software engineering workflows.
-
-### AI-Assisted Code Review
-
-An AI-based tool will analyze code changes and identify potential issues, including:
-
-- Code smells.
-- Maintainability concerns.
-- Missing input validation.
-- Potential security weaknesses.
-- Opportunities for refactoring.
-
-### Reproducible AI Quality Gates
-
-To evaluate the reliability of AI-assisted decisions, the project will implement reproducibility checks.
-
-These checks will include:
-
-- Version-controlled prompt templates.
-- Documented AI model versions.
-- Defined model parameters and decision thresholds.
-- Repeated execution under equivalent configurations.
-- Comparison and documentation of AI-generated decisions.
-- Analysis and mitigation of inconsistent results.
-
-AI-generated feedback will complement deterministic testing and security tools rather than replace them.
-
----
-
-## 🔒 Security and DevSecOps
-
-Security will be integrated throughout the software development lifecycle.
-
-Planned security practices include:
-
-- Secure password storage.
-- JWT-based authentication.
-- Authorization and protected endpoints.
-- Input validation.
-- Environment variable management.
-- Dependency vulnerability scanning.
-- Static security analysis using Semgrep.
-- Dynamic security analysis using OWASP ZAP.
-- Automated security gates within GitHub Actions.
-
----
-
-## 📈 Monitoring and Observability
-
-FinTrack will include an observability layer to monitor application behavior and identify potential problems.
-
-### Planned Metrics
-
-- HTTP request duration.
-- API response times.
-- Application error rates.
-- Service availability.
-- Resource utilization.
-- Database-related performance indicators.
-
-### Monitoring Tools
-
-**Prometheus** will be used to collect application metrics.
-
-**Grafana** will be used to visualize metrics through dashboards and alerts.
-
-At least one monitoring view or alert will explicitly highlight an architectural insight, such as a performance bottleneck or an unexpected dependency between components.
-
----
-
-## 🏛️ Architectural Feedback
-
-The project will implement the **CI/CD Pipelines as Architectural Feedback** practice.
-
-Starting from Sprint 2, relevant pipeline failures will be documented in Jira.
-
-Each Architectural Feedback record will include:
-
-1. Description of the pipeline failure.
-2. Root cause analysis.
-3. Architectural decision or property affected.
-4. Structural correction implemented.
-5. Evidence of the resulting improvement.
-
-This approach encourages the team to interpret pipeline failures as opportunities to improve the system architecture.
-
----
-
-## 🔁 Agile Development — Scrum
-
-The project follows the Scrum methodology and is organized into **five two-week sprints**.
-
-The team will maintain a Product Backlog and Sprint Backlogs using Jira.
-
-Scrum activities will include:
-
-- Sprint Planning.
-- Daily Scrum meetings.
-- Sprint Reviews.
-- Sprint Retrospectives.
-- Incremental delivery of working software.
-
-The Product Owner role will rotate between team members throughout the project.
-
-### Development Roadmap
-
-| Sprint | Main Focus | Planned Deliverables |
+| Componente | Tecnologia | Papel |
 |---|---|---|
-| Sprint 1 | Project Setup and Architecture | Repository, Jira, architecture, initial application |
-| Sprint 2 | Application MVP and CI/CD | Core financial features, automated tests, initial security checks |
-| Sprint 3 | AI and Security Integration | AI quality gates, SAST/DAST integration, reproducibility checks |
-| Sprint 4 | Monitoring and Observability | Metrics, dashboards, alerts, architectural feedback |
-| Sprint 5 | Validation and Documentation | Final pipeline, demonstration, IEEE report |
+| Interface | React + Vite | Formulários, histórico, filtros e resumo mensal |
+| API | Node.js + Express | Endpoints HTTP, validação e tratamento de erros |
+| Persistência | PostgreSQL 16 + `pg` | Armazenamento e agregação de despesas |
+| Ambiente local | Docker Compose | Serviço PostgreSQL com volume persistente |
+| Testes | Vitest, Supertest e PGlite | Verificação dos endpoints e regras de dados |
+| Qualidade | ESLint | Análise estática do backend |
+| Segurança | Semgrep | Deteção de padrões de código inseguros |
+| CI | GitHub Actions | Execução automática dos checks em push e Pull Request |
 
-Progress and changes will be documented throughout the development process.
+Atualmente, **apenas PostgreSQL corre num container**. O backend e o frontend são iniciados separadamente com npm.
 
----
+## Estrutura principal
 
-## 🧪 Testing Strategy
+```text
+FinTrack/
+├── backend/                 # API Express, validação, repositório e testes
+├── frontend/                # Interface React e configuração Vite
+├── database/                # Esquema SQL
+├── security/                # Dependências, verificador e fixture SAST
+├── .github/workflows/       # Pipeline GitHub Actions
+├── docs/
+│   └── sprints/             # README de cada sprint iniciado
+├── compose.yaml             # PostgreSQL local
+├── .env.example             # Exemplo de configuração do Compose
+└── README.md                # Visão geral do projeto
+```
 
-The project will implement different levels of automated testing.
+## Qualidade e segurança
 
-### Unit Testing
+A pipeline configurada inclui três jobs: validação do backend, build do frontend e SAST com Semgrep. Os comandos e os limites dos checks estão descritos no [Sprint 2](docs/sprints/sprint-2/README.md#testes-e-qualidade).
 
-Validate individual functions and business rules.
+DAST, gates de IA reproduzíveis, deployment e observabilidade fazem parte da evolução do projeto; não estão implementados nesta versão. A existência do workflow no código não substitui a confirmação da sua execução no GitHub Actions.
 
-Examples:
+## Organização do trabalho
 
-- Transaction amount validation.
-- Financial balance calculations.
-- Budget limit calculations.
+O projeto segue Scrum, com backlog e tarefas em Jira, revisão cruzada e rotação do papel de Product Owner. Desde o Sprint 2, as falhas reais da pipeline devem alimentar o **Architectural Feedback Log**, relacionando causa, decisão arquitetural afetada e correção estrutural.
 
-### Integration Testing
+## Referências do projeto
 
-Verify communication between application components.
+- [Repositório GitHub](https://github.com/santiiago90/FinTrack)
+- [Execuções GitHub Actions](https://github.com/santiiago90/FinTrack/actions)
+- [Quadro Jira](https://santiagoadaofernandes.atlassian.net/jira/software/projects/XOPS/boards/34/backlog)
+- [Requisitos do MVP](docs/mvp-requirements.md)
+- [ADR-001: monólito modular](docs/adr-001-modular-monolith.md)
+- [Contrato da API de despesas](docs/api-expenses.md)
+- [Configuração e limites do SAST](docs/security.md)
 
-Examples:
-
-- API and database interaction.
-- User authentication.
-- Transaction creation and retrieval.
-
-### Security Testing
-
-Validate application security through automated static and dynamic analysis.
-
-### AI Quality Evaluation
-
-Compare AI-generated decisions across repeated executions to assess stability and reliability.
-
----
-
-## 📚 Academic Context
-
-This project is being developed as part of the curricular unit:
-
-**Plataformas e Serviços X-Ops (2026/2027)**
-
-**Degree:** Bachelor's Degree in Web, Mobile and Cloud Computing
-
-**Institution:** Universidade da Beira Interior (UBI)
-
-**Faculty:** Faculty of Engineering — Department of Computer Science
-
-**Professor:** Nuno Pombo
-
-The project provides practical experience in software engineering, DevOps, DevSecOps, AIOps, AI-assisted development, and Agile methodologies.
-
----
-
-## 📄 Documentation
-
-Project documentation will be maintained in the `docs/` directory and through the team's Jira workspace.
-
-Planned documentation includes:
-
-- Software architecture and design decisions.
-- Database schema and API documentation.
-- CI/CD pipeline configuration.
-- Security analysis results.
-- Architectural Feedback Log.
-- AI reproducibility experiments.
-- Sprint documentation and retrospectives.
-- Final IEEE project report.
-
----
-
-## 🚧 Development Status
-
-**Current Status: Initial Setup**
-
-FinTrack is currently in its early development stage.
-
-Features, infrastructure components, and automated quality gates described in this README represent the planned implementation and will be developed incrementally.
-
----
-
-**FinTrack — Personal Finance Management powered by modern DevSecOps and AI-assisted Software Engineering.**
+Os READMEs dos sprints descrevem os incrementos concretos. Os documentos de requisitos e arquitetura podem incluir contexto histórico e funcionalidades previstas.

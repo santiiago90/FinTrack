@@ -1,48 +1,87 @@
-
-# Pipeline de Integração Contínua do FinTrack
 name: FinTrack CI
-
-# Executar em pushes e Pull Requests para a branch main
 on:
   push:
-    branches: [main]
   pull_request:
-    branches: [main]
-
+permissions:
+  contents: read
 jobs:
   backend-ci:
     name: Backend - Lint, Build e Testes
     runs-on: ubuntu-latest
-
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: fintrack_test
+          POSTGRES_USER: fintrack
+          POSTGRES_PASSWORD: test_only_password
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U fintrack -d fintrack_test"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      TEST_DATABASE_URL: postgresql://fintrack:test_only_password@localhost:5432/fintrack_test
     defaults:
       run:
         working-directory: backend
-
     steps:
-      # Obter o código do repositório
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      # Preparar o ambiente Node.js
-      - name: Configurar Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: "22"
+          node-version: '22'
           cache: npm
           cache-dependency-path: backend/package-lock.json
-
-      # Instalar as dependências
-      - name: Instalar dependências
-        run: npm ci
-
-      # Verificar a qualidade do código
-      - name: Executar ESLint
-        run: npm run lint
-
-      # Verificar a sintaxe do backend
-      - name: Verificar build
-        run: npm run build
-
-      # Executar testes automatizados
-      - name: Executar testes
-        run: npm test
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build
+      - run: npm test
+  frontend-ci:
+    name: Frontend - Build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm run build
+  sast:
+    name: SAST - Semgrep
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: pip install -r security/requirements.txt
+      - name: Verificar que uma vulnerabilidade faz falhar o gate
+        shell: bash
+        run: |
+          mkdir -p /tmp/fintrack-sast-fixture
+          cp security/fixtures/unsafe.js /tmp/fintrack-sast-fixture/
+          set +e
+          semgrep scan --config .semgrep.yml --metrics off --disable-version-check --strict --error --json-output /tmp/fixture.json /tmp/fintrack-sast-fixture
+          result=$?
+          set -e
+          test "$result" -eq 1
+          node -e "const r=require('/tmp/fixture.json'); if(r.errors.length || !r.results.some(x => x.check_id.endsWith('fintrack-no-eval'))) process.exit(1)"
+      - name: Analisar código e produzir relatório
+        run: semgrep scan --config .semgrep.yml --metrics off --disable-version-check --strict --error --json-output security/semgrep-results.json backend/src frontend/src
+      - name: Verificar resultados e erros de análise
+        if: always()
+        run: node security/check-report.mjs security/semgrep-results.json
+      - name: Guardar resultados
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: semgrep-results
+          path: security/semgrep-results.json
+          if-no-files-found: error

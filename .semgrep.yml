@@ -1,0 +1,34 @@
+rules:
+  - id: fintrack-no-eval
+    languages: [javascript, typescript]
+    severity: ERROR
+    message: Não execute código dinâmico com eval.
+    pattern: eval(...)
+  - id: fintrack-no-function-constructor
+    languages: [javascript, typescript]
+    severity: ERROR
+    message: Não construa código executável a partir de texto.
+    pattern: new Function(...)
+  - id: fintrack-no-html-injection
+    languages: [javascript, typescript]
+    severity: ERROR
+    message: Use renderização de texto React em vez de HTML não sanitizado.
+    pattern: <$TAG ... dangerouslySetInnerHTML=$VALUE ... />
+  - id: fintrack-no-shell-exec
+    languages: [javascript, typescript]
+    severity: ERROR
+    message: Evite comandos shell; use APIs específicas ou execFile com argumentos separados.
+    pattern-either:
+      - pattern: require('child_process').exec(...)
+      - patterns:
+          - pattern-inside: |
+              import { ..., exec, ... } from 'node:child_process';
+              ...
+          - pattern: exec(...)
+  - id: fintrack-no-interpolated-sql
+    languages: [javascript, typescript]
+    severity: ERROR
+    message: Use parâmetros SQL em vez de interpolar valores na query.
+    pattern-either:
+      - pattern: $DB.query(`... ${$VALUE} ...`, ...)
+      - pattern: $DB.query($SQL + $REQ.$FIELD, ...)
