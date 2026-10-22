@@ -571,4 +571,8 @@ Esta lista descreve os resultados exigidos para o projeto completo. Não represe
 
 As referências dos restantes sprints serão acrescentadas quando esses sprints começarem.
 
+<<<<<<< HEAD
 Cada README de sprint deve identificar o objetivo, o trabalho realizado, a validação disponível e os pontos ainda por concluir.
+=======
+Cada README de sprint deve identificar o objetivo, o trabalho realizado, a validação disponível e os pontos ainda por concluir.
+>>>>>>> 5a8ef9ba51953c836726a964d85005b157c37da0
