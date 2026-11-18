@@ -9,6 +9,8 @@ jobs:
   dast:
     runs-on: ubuntu-latest
     timeout-minutes: 25
+    env: 
+      STAGING_PORT: '8080'
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
