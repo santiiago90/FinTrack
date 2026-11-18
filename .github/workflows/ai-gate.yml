@@ -1,0 +1,45 @@
+name: FinTrack AI Gate
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      scenario:
+        description: Cenário sintético a enviar à OpenAI em duas chamadas
+        type: choice
+        options: [complete, incomplete]
+        default: complete
+permissions:
+  contents: read
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --test ai-gate/gate.test.mjs
+  p2:
+    if: github.event_name == 'workflow_dispatch'
+    needs: contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Executar gate duas vezes com a mesma entrada
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          SCENARIO: ${{ inputs.scenario }}
+        run: node ai-gate/gate.mjs "ai-gate/fixtures/$SCENARIO.json"
+      - name: Publicar evidência P2
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fintrack-p2
+          path: artifacts/ai-gate/
+          if-no-files-found: error
+

@@ -10,3 +10,5 @@ coverage/
 security/*-results.json
 
 .venv-sast/
+
+/artifacts/

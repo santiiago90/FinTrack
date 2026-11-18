@@ -1,0 +1,37 @@
+name: FinTrack DAST
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  dast:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Arrancar staging
+        run: docker compose -p fintrack-sprint3 -f compose.staging.yaml up -d --build --wait --wait-timeout 120 web
+      - name: Verificar fluxo de despesas
+        run: node scripts/staging-smoke.mjs
+      - name: Analisar interface e API com ZAP
+        run: node scripts/dast.mjs
+      - name: Recolher logs de staging
+        if: always()
+        run: |
+          mkdir -p artifacts/dast
+          docker compose -p fintrack-sprint3 -f compose.staging.yaml logs --no-color > artifacts/dast/staging.log
+      - name: Publicar relatórios
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fintrack-dast
+          path: artifacts/dast/
+      - name: Parar staging
+        if: always()
+        run: docker compose -p fintrack-sprint3 -f compose.staging.yaml down
+

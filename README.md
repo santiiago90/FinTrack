@@ -568,11 +568,8 @@ Esta lista descreve os resultados exigidos para o projeto completo. Não represe
 |---|---|---|
 | Sprint 1 | [Fundação do projeto e CI inicial](docs/sprints/sprint-1/README.md) | Requisitos, arquitetura, backend inicial e organização |
 | Sprint 2 | [MVP de despesas, persistência e SAST](docs/sprints/sprint-2/README.md) | Implementações, configuração, arranque, testes e segurança |
+| Sprint 3 | [Staging, DAST e gate de IA](docs/sprints/sprint-3/README.md) | Docker, análise dinâmica, validação do gate e evidências P1 e P2 |
 
 As referências dos restantes sprints serão acrescentadas quando esses sprints começarem.
 
-<<<<<<< HEAD
 Cada README de sprint deve identificar o objetivo, o trabalho realizado, a validação disponível e os pontos ainda por concluir.
-=======
-Cada README de sprint deve identificar o objetivo, o trabalho realizado, a validação disponível e os pontos ainda por concluir.
->>>>>>> 5a8ef9ba51953c836726a964d85005b157c37da0

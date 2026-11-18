@@ -1,0 +1,52 @@
+# Staging isolado, apenas para dados fictícios.
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: fintrack_staging
+      POSTGRES_USER: fintrack_staging
+      POSTGRES_PASSWORD: staging_only_password
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fintrack_staging -d fintrack_staging"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+  api:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    environment:
+      DB_HOST: db
+      DB_NAME: fintrack_staging
+      DB_USER: fintrack_staging
+      DB_PASSWORD: staging_only_password
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/expenses').then(r => { if (!r.ok) process.exit(1) }).catch(() => process.exit(1))"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+  web:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    ports:
+      - "127.0.0.1:${STAGING_PORT:-5173}:8080"
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8080/api/expenses"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+  zap:
+    image: ghcr.io/zaproxy/zaproxy:stable
+    profiles: [scan]
+    volumes:
+      - ./artifacts/dast:/zap/wrk:rw
+
