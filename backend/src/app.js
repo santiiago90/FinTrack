@@ -3,13 +3,16 @@ import cors from 'cors';
 import { pool } from './db.js';
 import { expenseRepository } from './expenses/repository.js';
 import { expenseRoutes } from './expenses/routes.js';
-export function createApp(repository = expenseRepository(pool)) {
+import { createMetrics } from './metrics.js';
+export function createApp(repository = expenseRepository(pool), { metrics = createMetrics({ pool }) } = {}) {
   const app = express();
   app.disable('x-powered-by');
+  app.use(metrics.httpMiddleware);
   app.use(cors({ origin: process.env.FRONTEND_ORIGIN || 'http://localhost:5173' }));
   app.use(express.json({ limit: '16kb' }));
   app.get('/api/health', (req, res) => res.json({ status: 'ok', message: 'API FinTrack em funcionamento' }));
-  app.use('/api/expenses', expenseRoutes(repository));
+  app.get('/metrics', metrics.handler);
+  app.use('/api/expenses', expenseRoutes(metrics.instrumentRepository(repository)));
   app.use((req, res) => res.status(404).json({ message: 'Endpoint não encontrado.' }));
   app.use((err, req, res, next) => {
     if (res.headersSent) return next(err);

@@ -166,7 +166,7 @@ Atualmente, as rotas, as validações e o acesso SQL das despesas estão organiz
 | Área | Tecnologia ou abordagem prevista | Estado |
 |---|---|---|
 | DAST | OWASP ZAP | Por integrar |
-| Métricas | Prometheus | Por integrar |
+| Métricas | Prometheus | Integrado no staging (Sprint 4) |
 | Dashboards | Grafana | Por integrar |
 | Gates de IA | Integração com um modelo através de API | Modelo, configuração e critérios por definir |
 | Ambientes | Containerização dos componentes necessários e staging | Por completar |
@@ -569,6 +569,7 @@ Esta lista descreve os resultados exigidos para o projeto completo. Não represe
 | Sprint 1 | [Fundação do projeto e CI inicial](docs/sprints/sprint-1/README.md) | Requisitos, arquitetura, backend inicial e organização |
 | Sprint 2 | [MVP de despesas, persistência e SAST](docs/sprints/sprint-2/README.md) | Implementações, configuração, arranque, testes e segurança |
 | Sprint 3 | [Staging, DAST e gate de IA](docs/sprints/sprint-3/README.md) | Docker, análise dinâmica, validação do gate e evidências P1 e P2 |
+| Sprint 4 | [Observabilidade e entrega](docs/sprints/sprint-4/README.md) | Métricas HTTP e PostgreSQL com Prometheus; restantes tarefas em curso |
 
 As referências dos restantes sprints serão acrescentadas quando esses sprints começarem.
 
