@@ -1,0 +1,10 @@
+# Carrega os dashboards versionados em observability/grafana/dashboards (XOPS-30).
+apiVersion: 1
+providers:
+  - name: fintrack
+    folder: FinTrack
+    type: file
+    disableDeletion: true
+    allowUiUpdates: false
+    options:
+      path: /var/lib/grafana/dashboards

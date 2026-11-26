@@ -1,7 +1,8 @@
 import { Counter, Gauge, Histogram, Registry, collectDefaultMetrics } from 'prom-client';
 
-const HTTP_BUCKETS = [0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5];
-const DB_BUCKETS = [0.001, 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 1];
+// Os buckets superiores cobrem os timeouts da base de dados (2 s + 5 s), para o p95 não ficar cortado (XOPS-30).
+const HTTP_BUCKETS = [0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10];
+const DB_BUCKETS = [0.001, 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10];
 const seconds = start => Number(process.hrtime.bigint() - start) / 1e9;
 
 // Cada instância da aplicação tem o seu registry, para os testes poderem criar várias.

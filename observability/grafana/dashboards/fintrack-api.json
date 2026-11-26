@@ -1,0 +1,516 @@
+{
+  "uid": "fintrack-api",
+  "title": "FinTrack API",
+  "tags": [
+    "fintrack",
+    "xops-30"
+  ],
+  "timezone": "browser",
+  "editable": false,
+  "refresh": "5s",
+  "schemaVersion": 41,
+  "version": 1,
+  "time": {
+    "from": "now-15m",
+    "to": "now"
+  },
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": false,
+        "iconColor": "rgba(255, 152, 48, 1)",
+        "name": "Fases do cenário",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "panels": [
+    {
+      "type": "row",
+      "title": "Tráfego e erros",
+      "id": 1,
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "panels": []
+    },
+    {
+      "type": "timeseries",
+      "title": "Pedidos por segundo, por rota",
+      "description": "Ritmo de pedidos HTTP por rota normalizada.",
+      "id": 2,
+      "datasource": {
+        "type": "prometheus",
+        "uid": "fintrack-prometheus"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 10,
+        "x": 0,
+        "y": 1
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "fintrack-prometheus"
+          },
+          "expr": "sum by (route) (rate(fintrack_http_requests_total{route!=\"/metrics\"}[30s]))",
+          "legendFormat": "{{route}}",
+          "range": true
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Erros 5xx (%)",
+      "description": "Percentagem de respostas 5xx em todas as rotas.",
+      "id": 3,
+      "datasource": {
+        "type": "prometheus",
+        "uid": "fintrack-prometheus"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 7,
+        "x": 10,
+        "y": 1
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "fintrack-prometheus"
+          },
+          "expr": "100 * sum(rate(fintrack_http_requests_total{route!=\"/metrics\",status_code=~\"5..\"}[30s])) / clamp_min(sum(rate(fintrack_http_requests_total{route!=\"/metrics\"}[30s])), 1e-9)",
+          "legendFormat": "5xx",
+          "range": true
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Erros 4xx por rota",
+      "description": "Pedidos rejeitados pela validação (400) ou inexistentes (404).",
+      "id": 4,
+      "datasource": {
+        "type": "prometheus",
+        "uid": "fintrack-prometheus"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 7,
+        "x": 17,
+        "y": 1
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "fintrack-prometheus"
+          },
+          "expr": "sum by (route, status_code) (rate(fintrack_http_requests_total{route!=\"/metrics\",status_code=~\"4..\"}[30s]))",
+          "legendFormat": "{{route}} {{status_code}}",
+          "range": true
+        }
+      ]
+    },
+    {
+      "type": "row",
+      "title": "Latência",
+      "id": 5,
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 9
+      },
+      "panels": []
+    },
+    {
+      "type": "timeseries",
+      "title": "Latência HTTP p50 e p95",
+      "description": "Latência das rotas de despesas, medida na API (sem nginx).",
+      "id": 6,
+      "datasource": {
+        "type": "prometheus",
+        "uid": "fintrack-prometheus"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 10
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "fintrack-prometheus"
+          },
+          "expr": "histogram_quantile(0.95, sum by (le, route) (rate(fintrack_http_request_duration_seconds_bucket{route=~\"/api/expenses.*\"}[30s])))",
+          "legendFormat": "p95 {{route}}",
+          "range": true
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "fintrack-prometheus"
+          },
+          "expr": "histogram_quantile(0.5, sum by (le, route) (rate(fintrack_http_request_duration_seconds_bucket{route=~\"/api/expenses.*\"}[30s])))",
+          "legendFormat": "p50 {{route}}",
+          "range": true
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Latência PostgreSQL p95 por operação",
+      "description": "Inclui a espera por uma ligação do pool e o tempo da query.",
+      "id": 7,
+      "datasource": {
+        "type": "prometheus",
+        "uid": "fintrack-prometheus"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 10
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "fintrack-prometheus"
+          },
+          "expr": "histogram_quantile(0.95, sum by (le, operation) (rate(fintrack_db_operation_duration_seconds_bucket[30s])))",
+          "legendFormat": "{{operation}}",
+          "range": true
+        }
+      ]
+    },
+    {
+      "type": "row",
+      "title": "Dependência API → PostgreSQL",
+      "id": 8,
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 18
+      },
+      "panels": []
+    },
+    {
+      "type": "timeseries",
+      "title": "API vs PostgreSQL (p95)",
+      "description": "Se as duas curvas sobem juntas, o tempo da API é dominado pela base de dados.",
+      "id": 9,
+      "datasource": {
+        "type": "prometheus",
+        "uid": "fintrack-prometheus"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 19
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "fintrack-prometheus"
+          },
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(fintrack_http_request_duration_seconds_bucket{route=~\"/api/expenses.*\"}[30s])))",
+          "legendFormat": "HTTP p95 /api/expenses*",
+          "range": true
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "fintrack-prometheus"
+          },
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(fintrack_db_operation_duration_seconds_bucket[30s])))",
+          "legendFormat": "PostgreSQL p95 (todas as operações)",
+          "range": true
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Pool de ligações PostgreSQL",
+      "description": "Ligações abertas, livres e pedidos à espera de ligação (máximo 10 no pg.Pool).",
+      "id": 10,
+      "datasource": {
+        "type": "prometheus",
+        "uid": "fintrack-prometheus"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 12,
+        "y": 19
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "fintrack-prometheus"
+          },
+          "expr": "sum by (state) (fintrack_db_pool_connections)",
+          "legendFormat": "{{state}}",
+          "range": true
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Erros PostgreSQL por operação",
+      "description": "Falhas e timeouts das operações do repositório.",
+      "id": 11,
+      "datasource": {
+        "type": "prometheus",
+        "uid": "fintrack-prometheus"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 18,
+        "y": 19
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "fintrack-prometheus"
+          },
+          "expr": "sum by (operation) (rate(fintrack_db_operation_errors_total[30s]))",
+          "legendFormat": "{{operation}}",
+          "range": true
+        }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "API disponível",
+      "description": "Resultado da última recolha do Prometheus à API.",
+      "id": 12,
+      "datasource": {
+        "type": "prometheus",
+        "uid": "fintrack-prometheus"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 27
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "Em baixo",
+                  "color": "red"
+                },
+                "1": {
+                  "text": "Disponível",
+                  "color": "green"
+                }
+              }
+            }
+          ]
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "background",
+        "graphMode": "none",
+        "textMode": "value"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "fintrack-prometheus"
+          },
+          "expr": "up{job=\"fintrack-api\"}",
+          "legendFormat": "API",
+          "range": false,
+          "instant": true
+        }
+      ]
+    }
+  ]
+}
