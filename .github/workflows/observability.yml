@@ -1,0 +1,49 @@
+name: FinTrack Observability
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  metrics:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      STAGING_PORT: '8080'
+      PROMETHEUS_PORT: '9090'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Arrancar staging com Prometheus
+        run: docker compose -p fintrack-sprint4 -f compose.staging.yaml up -d --build --wait --wait-timeout 120 web prometheus
+      - name: Executar fluxo de despesas
+        run: node scripts/staging-smoke.mjs
+      - name: Verificar métricas no Prometheus
+        run: node scripts/metrics-check.mjs
+      - name: Confirmar que /metrics não é público
+        shell: bash
+        run: |
+          mkdir -p artifacts/observability
+          code=$(curl -s -o artifacts/observability/public-metrics.txt -w '%{http_code}' "http://127.0.0.1:$STAGING_PORT/metrics")
+          echo "GET /metrics via nginx: HTTP $code" | tee artifacts/observability/public-metrics-status.txt
+          if grep -q '^# HELP fintrack_' artifacts/observability/public-metrics.txt; then
+            echo "As métricas estão expostas pelo nginx." >&2
+            exit 1
+          fi
+      - name: Recolher logs
+        if: always()
+        run: |
+          mkdir -p artifacts/observability
+          docker compose -p fintrack-sprint4 -f compose.staging.yaml logs --no-color > artifacts/observability/staging.log
+      - name: Publicar evidência
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fintrack-observability
+          path: artifacts/observability/
+      - name: Parar staging
+        if: always()
+        run: docker compose -p fintrack-sprint4 -f compose.staging.yaml down
