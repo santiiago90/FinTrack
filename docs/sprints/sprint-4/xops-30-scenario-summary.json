@@ -1,0 +1,98 @@
+{
+  "generatedAt": "2026-11-26T02:27:26.974Z",
+  "timeline": {
+    "startedAt": "2026-11-26T02:23:29.219Z",
+    "origin": "http://127.0.0.1:8080",
+    "project": "fintrack-staging",
+    "phases": [
+      {
+        "name": "base",
+        "start": "2026-11-26T02:23:29.561Z",
+        "requests": 35679,
+        "failures": 7767,
+        "status": {
+          "200": 20912,
+          "201": 4208,
+          "400": 2792,
+          "502": 7767
+        },
+        "end": "2026-11-26T02:24:29.563Z"
+      },
+      {
+        "name": "rajada",
+        "start": "2026-11-26T02:24:29.595Z",
+        "requests": 43213,
+        "failures": 14999,
+        "status": {
+          "200": 28214,
+          "502": 14999
+        },
+        "end": "2026-11-26T02:25:29.628Z"
+      },
+      {
+        "name": "db-indisponivel",
+        "start": "2026-11-26T02:25:29.651Z",
+        "requests": 2125,
+        "failures": 2119,
+        "status": {
+          "400": 6,
+          "500": 27,
+          "502": 2092
+        },
+        "end": "2026-11-26T02:26:01.801Z"
+      },
+      {
+        "name": "recuperacao",
+        "start": "2026-11-26T02:26:01.819Z",
+        "requests": 21086,
+        "failures": 0,
+        "status": {
+          "200": 15687,
+          "201": 3281,
+          "400": 2118
+        },
+        "end": "2026-11-26T02:27:01.821Z"
+      }
+    ],
+    "endedAt": "2026-11-26T02:27:01.848Z",
+    "aborted": false
+  },
+  "rows": [
+    {
+      "phase": "base",
+      "rps": 475.67272727272723,
+      "errorPct": null,
+      "httpP95Ms": 4.96998480243161,
+      "dbP95Ms": 4.512469437652811,
+      "poolWaitingMax": 0,
+      "dbErrors": null
+    },
+    {
+      "phase": "rajada",
+      "rps": 513.5823120840757,
+      "errorPct": null,
+      "httpP95Ms": 68.99860594795537,
+      "dbP95Ms": 45.20539750066472,
+      "poolWaitingMax": 16,
+      "dbErrors": null
+    },
+    {
+      "phase": "db-indisponivel",
+      "rps": 1.234938738809178,
+      "errorPct": 83.8075634088441,
+      "httpP95Ms": 2427.753131039361,
+      "dbP95Ms": 2483.977272659736,
+      "poolWaitingMax": 0,
+      "dbErrors": 35.22658963411155
+    },
+    {
+      "phase": "recuperacao",
+      "rps": 343.7880688739795,
+      "errorPct": 0,
+      "httpP95Ms": 9.993628036638789,
+      "dbP95Ms": 8.677494000685632,
+      "poolWaitingMax": 0,
+      "dbErrors": 0
+    }
+  ]
+}

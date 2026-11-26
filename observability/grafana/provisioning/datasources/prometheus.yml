@@ -1,0 +1,12 @@
+# Datasource do staging (XOPS-30). O uid é usado pelo dashboard versionado.
+apiVersion: 1
+datasources:
+  - name: Prometheus
+    uid: fintrack-prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
+    editable: false
+    jsonData:
+      timeInterval: 5s

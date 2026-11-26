@@ -8,8 +8,8 @@ O objetivo é explicar o comportamento do FinTrack em execução, alertar sobre 
 
 | Tarefa | Responsável no Jira | Critério de aceitação | Estado no repositório |
 |---|---|---|---|
-| [XOPS-29](https://santiagoadaofernandes.atlassian.net/browse/XOPS-29) | Santiago | Métricas HTTP e PostgreSQL, recolha Prometheus versionada, demonstração reproduzível | Entregue nesta branch |
-| [XOPS-30](https://santiagoadaofernandes.atlassian.net/browse/XOPS-30) | João | Dashboard Grafana provisionado, vista de gargalo, cenário controlado e capturas | Por fazer |
+| [XOPS-29](https://santiagoadaofernandes.atlassian.net/browse/XOPS-29) | Santiago | Métricas HTTP e PostgreSQL, recolha Prometheus versionada, demonstração reproduzível | Integrado ([PR #3](https://github.com/santiiago90/FinTrack/pull/3)) |
+| [XOPS-30](https://santiagoadaofernandes.atlassian.net/browse/XOPS-30) | João | Dashboard Grafana provisionado, vista de gargalo, cenário controlado e capturas | Implementado; evidência em [xops-30-evidencia.md](xops-30-evidencia.md) |
 | [XOPS-31](https://santiagoadaofernandes.atlassian.net/browse/XOPS-31) | Santiago | Alertas versionados, disparo e recuperação, interpretação por IA com P2 | Por fazer |
 | [XOPS-32](https://santiagoadaofernandes.atlassian.net/browse/XOPS-32) | João | Entrega condicionada aos gates, versão identificada, recuperação demonstrada | Por fazer |
 | [XOPS-33](https://santiagoadaofernandes.atlassian.net/browse/XOPS-33) | Santiago | Gate de IA com evidência real dos testes e duas execuções comparadas | Por fazer |
@@ -64,6 +64,79 @@ docker compose -p fintrack-sprint4 -f compose.staging.yaml down
 
 A configuração de recolha está em [`observability/prometheus/prometheus.yml`](../../../observability/prometheus/prometheus.yml), com intervalo de 5 s. O Prometheus guarda os dados dentro do container; parar o staging apaga-os.
 
+## Dashboard e cenário controlado (XOPS-30)
+
+O staging inclui um **Grafana** já configurado, em http://127.0.0.1:3001. Abre sem login, em modo só de leitura, diretamente no dashboard **FinTrack API**. O datasource e o dashboard estão versionados em [`observability/grafana/`](../../../observability/grafana/). As alterações feitas na interface não são guardadas: muda-se o JSON e reinicia-se o Grafana.
+
+### Painéis
+
+| Linha | Painel | Como ler |
+|---|---|---|
+| Tráfego e erros | Pedidos por segundo, por rota | Carga de cada rota normalizada |
+| | Erros 5xx (%) | Falhas do servidor. Esperado: 0 na base e na recuperação. Na rajada, 5xx significam que pedidos esperaram mais de 2 s por uma ligação do pool, o que é um gargalo real a registar |
+| | Erros 4xx por rota | Pedidos inválidos (400) e inexistentes (404), que são esperados no cenário |
+| Latência | Latência HTTP p50 e p95 | Tempo medido na API, sem o nginx |
+| | Latência PostgreSQL p95 por operação | Inclui a espera por uma ligação do pool |
+| Dependência API → PostgreSQL | **API vs PostgreSQL (p95)** | Vista arquitetural: se as duas curvas sobem juntas, a latência da API vem da base de dados |
+| | Pool de ligações PostgreSQL | `waiting` > 0 indica que as 10 ligações do pool estão todas ocupadas |
+| | Erros PostgreSQL por operação | Timeouts e falhas das operações do repositório |
+| | API disponível | `up` do Prometheus para a API |
+
+As fases do cenário aparecem como anotações (marcas laranja) no eixo do tempo.
+
+### Executar o cenário
+
+Com o staging a correr (incluindo `grafana`), a partir da raiz do repositório:
+
+**Windows (PowerShell):**
+
+~~~powershell
+docker compose -p fintrack-staging -f compose.staging.yaml up -d --build --wait --wait-timeout 180
+node scripts/load-scenario.mjs
+node scripts/scenario-report.mjs
+cd observability/capture; npm ci; npx playwright install chromium; cd ../..
+node observability/capture/capture.mjs
+~~~
+
+**macOS (Terminal):**
+
+~~~bash
+docker compose -p fintrack-staging -f compose.staging.yaml up -d --build --wait --wait-timeout 180
+node scripts/load-scenario.mjs
+node scripts/scenario-report.mjs
+(cd observability/capture && npm ci && npx playwright install chromium)
+node observability/capture/capture.mjs
+~~~
+
+O cenário demora cerca de 4 minutos e passa por estas fases:
+
+| Fase | Duração | O que acontece |
+|---|---|---|
+| seed | — | Cria 300 despesas fictícias (categorias "Cenário …") |
+| `base` | 60 s | 2 clientes em simultâneo com uma mistura de leituras, escritas e pedidos inválidos |
+| `rajada` | 60 s | 60 clientes em simultâneo, só leituras (lista e resumo) |
+| `db-indisponivel` | 30 s | `docker compose pause db`: o PostgreSQL congela e a API responde com erro ao fim de 2 a 5 s |
+| `recuperacao` | 60 s | `unpause`, com o mesmo tráfego da fase base |
+
+As durações mudam-se com `SCENARIO_BASE_S`, `SCENARIO_BURST_S`, `SCENARIO_OUTAGE_S`, `SCENARIO_RECOVERY_S`, `SCENARIO_BURST_CONCURRENCY` e `SCENARIO_SEED`. Se o cenário for interrompido com `Ctrl+C`, o PostgreSQL é retomado na mesma.
+
+### Evidência gerada
+
+Tudo fica em `artifacts/observability/`:
+
+| Ficheiro | Conteúdo |
+|---|---|
+| `scenario-timeline.json` | Início e fim de cada fase, pedidos, falhas e códigos HTTP |
+| `scenario-queries.json` | Cada consulta PromQL usada (do resumo e de todos os painéis) e as séries obtidas |
+| `scenario-summary.md` / `.json` | Tabela por fase: pedidos/s, % de 5xx, p95 HTTP, p95 DB, máximo do pool à espera, total de erros DB. Cada linha mede só a sua fase, com uma consulta no fim da fase sobre a duração dela |
+| `dashboard.png`, `dashboard-dependencia.png` | Capturas do dashboard na janela do cenário |
+
+No CI, o job **scenario** do workflow FinTrack Observability corre o mesmo cenário em pushes para `main` e manualmente (*Run workflow*), e publica o artefacto `fintrack-scenario`.
+
+### Resiliência da ligação ao PostgreSQL
+
+Ao preparar o cenário descobriu-se que a API terminava se uma ligação inativa ao PostgreSQL falhasse (o `pg.Pool` emitia `error` sem ouvinte) e que não havia timeouts. O `backend/src/db.js` passou a tratar o erro do pool e a usar `DB_CONNECTION_TIMEOUT_MS` (2000 ms por omissão) e `DB_QUERY_TIMEOUT_MS` (5000 ms por omissão). Esta observação deve ser registada no Architectural Feedback Log (XOPS-34).
+
 ## CI
 
 O workflow [**FinTrack Observability**](../../../.github/workflows/observability.yml) corre em pushes, PRs e manualmente:
@@ -74,7 +147,10 @@ O workflow [**FinTrack Observability**](../../../.github/workflows/observability
 
 ## Limites
 
-- Só métricas: não há tracing distribuído nem logs estruturados.
+- Não há tracing distribuído nem logs estruturados.
+- O Prometheus e o Grafana do staging não guardam dados entre execuções.
+- Os histogramas de latência vão até 10 s; acima disso o p95 fica limitado a 10 s.
+- Os gráficos usam `rate` sobre 30 s, por isso cada curva reage com até 30 s de atraso a uma mudança de fase.
 - `/metrics` não tem autenticação; está protegido apenas por não ser publicado fora da rede do Compose. Não expor a porta 3000 da API.
 - As métricas não distinguem utilizadores: o MVP continua sem autenticação.
 - A duração PostgreSQL mede o método do repositório, incluindo a espera por uma ligação do pool; não separa tempo de rede e tempo de execução da query.

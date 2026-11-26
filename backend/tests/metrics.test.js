@@ -80,6 +80,14 @@ describe('Métricas Prometheus da API', () => {
     expect(await scrape(second)).toContain('fintrack_http_requests_total{method="GET",route="/api/expenses",status_code="200"} 1');
   });
 
+  it('histogramas cobrem os timeouts da base de dados', async () => {
+    const app = build();
+    await request(app).get('/api/expenses').expect(200);
+    const text = await scrape(app);
+    expect(text).toContain('fintrack_http_request_duration_seconds_bucket{le="10",method="GET",route="/api/expenses",status_code="200"}');
+    expect(text).toContain('fintrack_db_operation_duration_seconds_bucket{le="10",operation="list",outcome="success"}');
+  });
+
   it('publica o estado do pool', async () => {
     const metrics = createMetrics({ pool: { totalCount: 3, idleCount: 2, waitingCount: 1 } });
     const text = await metrics.registry.metrics();

@@ -17,12 +17,19 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Arrancar staging com Prometheus
-        run: docker compose -p fintrack-sprint4 -f compose.staging.yaml up -d --build --wait --wait-timeout 120 web prometheus
+      - name: Testes dos scripts de observabilidade
+        run: node --test scripts/lib/*.test.mjs
+      - name: Arrancar staging com Prometheus e Grafana
+        run: docker compose -p fintrack-sprint4 -f compose.staging.yaml up -d --build --wait --wait-timeout 180 web prometheus grafana
       - name: Executar fluxo de despesas
         run: node scripts/staging-smoke.mjs
       - name: Verificar métricas no Prometheus
         run: node scripts/metrics-check.mjs
+      - name: Confirmar dashboard provisionado no Grafana
+        shell: bash
+        run: |
+          for i in $(seq 1 20); do curl -sf -o /dev/null http://127.0.0.1:3001/api/dashboards/uid/fintrack-api && break; sleep 3; done
+          curl -sf http://127.0.0.1:3001/api/dashboards/uid/fintrack-api | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{const d=JSON.parse(s).dashboard;if(d.uid!=='fintrack-api')process.exit(1);console.log('Dashboard:',d.title,'-',d.panels.length,'painéis')})"
       - name: Confirmar que /metrics não é público
         shell: bash
         run: |
@@ -47,3 +54,48 @@ jobs:
       - name: Parar staging
         if: always()
         run: docker compose -p fintrack-sprint4 -f compose.staging.yaml down
+
+  scenario:
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
+    needs: metrics
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      STAGING_PORT: '8080'
+      PROMETHEUS_PORT: '9090'
+      GRAFANA_PORT: '3001'
+      COMPOSE_PROJECT: fintrack-staging
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Arrancar staging com Prometheus e Grafana
+        run: docker compose -p fintrack-staging -f compose.staging.yaml up -d --build --wait --wait-timeout 180 web prometheus grafana
+      - name: Verificar fluxo de despesas
+        run: node scripts/staging-smoke.mjs
+      - name: Executar cenário controlado
+        run: node scripts/load-scenario.mjs
+      - name: Gerar relatório por fase
+        run: node scripts/scenario-report.mjs
+      - name: Instalar Playwright
+        working-directory: observability/capture
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+      - name: Capturar dashboard
+        run: node observability/capture/capture.mjs
+      - name: Recolher logs
+        if: always()
+        run: |
+          mkdir -p artifacts/observability
+          docker compose -p fintrack-staging -f compose.staging.yaml logs --no-color > artifacts/observability/scenario-staging.log
+      - name: Publicar evidência do cenário
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fintrack-scenario
+          path: artifacts/observability/
+      - name: Parar staging
+        if: always()
+        run: docker compose -p fintrack-staging -f compose.staging.yaml down

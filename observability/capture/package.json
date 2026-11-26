@@ -1,0 +1,12 @@
+{
+  "name": "fintrack-dashboard-capture",
+  "private": true,
+  "type": "module",
+  "description": "Capturas do dashboard Grafana do staging (XOPS-30).",
+  "scripts": {
+    "capture": "node capture.mjs"
+  },
+  "dependencies": {
+    "playwright": "1.65.1"
+  }
+}
